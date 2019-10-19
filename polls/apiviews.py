@@ -6,7 +6,11 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from .models import Poll, Choice
-from .serializers import PollSerializer, ChoiceSerializer, VoteSerializer
+from .serializers import PollSerializer, ChoiceSerializer, VoteSerializer, UserSerializer
+
+
+class UserCreate(generics.CreateAPIView):
+    serializer_class = UserSerializer
 
 
 class PollViewSet(viewsets.ModelViewSet):
