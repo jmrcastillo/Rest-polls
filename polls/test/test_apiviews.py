@@ -1,6 +1,7 @@
 
 
 from rest_framework.test import APITestCase
+from rest_framework.test import APIClient
 from rest_framework.test import APIRequestFactory
 # autho rest
 from rest_framework.authtoken.models import Token
@@ -14,6 +15,9 @@ from polls.apiviews import PollViewSet
 class TestPoll(APITestCase):
 
     def setUp(self):
+        # apiclient
+        self.client = APIClient()
+        # API Request
         self.factory = APIRequestFactory()
         self.view = PollViewSet.as_view({'get': 'list'})
         self.uri = '/polls/'
@@ -39,3 +43,20 @@ class TestPoll(APITestCase):
         response = self.view(request)
         self.assertEqual(response.status_code, 200,
                          f'Expected Response Code 200, recieved {response.status_code}')
+
+    def test_list2(self):
+        # Login
+        self.client.login(username="test", password="test")
+        response = self.client.get(self.uri)
+        self.assertEqual(response.status_code, 200,
+                         f'Expected Response Code 200, recieved {response.status_code}')
+
+    def test_create(self):
+        self.client.login(username="test", password="test")
+        params = {
+            "question": "How are you",
+            "created_by": 1
+        }
+        response = self.client.post(self.uri, params)
+        self.assertEqual(response.status_code, 201,
+                         f'Expected Response Code 201, recieved {response.status_code}')
