@@ -1,6 +1,8 @@
 
 
 from rest_framework import serializers
+# authenticate
+from rest_framework.authtoken.models import Token
 
 from .models import Poll, Choice, Vote
 # User
@@ -21,6 +23,8 @@ class UserSerializer(serializers.ModelSerializer):
         )
         user.set_password(validated_data['password'])
         user.save()
+        # authentication token
+        Token.objects.create(user=user)
         return user
 
 
