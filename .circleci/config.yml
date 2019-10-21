@@ -1,0 +1,43 @@
+
+
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version desire here
+      - image: circleci/python:3.6.1
+
+    working_directory: ~/circleci-djangorest
+
+    steps:
+      - checkout
+
+        # Download and cache dependencies
+      - restor_cache:
+        keys:
+          - v1-dependencies-{{ checksum "pollsapi/Pipfile" }}
+          # fallback to using the latest cache if not exact match fount
+          - v1-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . pipenv shell
+            pipenv install
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "Pipfile" }}
+
+      - run:
+          name: run tests
+          command: |
+            . pipenv shell
+            cd pollsapi
+            python manage.py test
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
