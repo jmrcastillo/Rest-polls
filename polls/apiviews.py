@@ -3,6 +3,8 @@
 from rest_framework import generics, viewsets
 from rest_framework.views import APIView
 from rest_framework import status
+# Exception
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from .models import Poll, Choice
@@ -38,6 +40,13 @@ class PollViewSet(viewsets.ModelViewSet):
     queryset = Poll.objects.all()
     serializer_class = PollSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        """Only authenticated users can delete polls they created"""
+        poll = Poll.object.get(pk=self.kwargs["pk"])
+        if not request.user == poll.created_by:
+            raise PermissionDenied("You can not delete this poll")
+        return super().destroy(request, *args, **kwargs)
+
 
 class ChoiceList(generics.ListCreateAPIView):
 
@@ -45,6 +54,12 @@ class ChoiceList(generics.ListCreateAPIView):
         queryset = Choice.objects.filter(poll_id=self.kwargs["pk"])
         return queryset
     serializer_class = ChoiceSerializer
+
+    def post(self, request, *args, **kwargs):
+        poll = Poll.objects.get(pk=self.kwargs["pk"])
+        if not request.user == poll.created_by:
+            raise PermissionDenied("You can not created choice for this list")
+        return super().post(request, *args, **kwargs)
 
 
 class CreateVote(APIView):
