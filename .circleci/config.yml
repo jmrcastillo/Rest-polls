@@ -3,40 +3,49 @@
 version: 2
 jobs:
   build:
+    # Working Directory
+    working_directory: ~/Rest-polls
     docker:
-      # specify the version desire here
+      # Python Version
       - image: circleci/python:3.6.1
+        environment:
+          PIPENV_VENV_IN_PROJECT: true
+          DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=disable
 
-    working_directory: ~/circleci-djangorest
+      # Postgresql
+      - image: circleci/postgres:9.6.2
+        environment:
+          POSTGRES_USER: root
+          POSTGRES_DB: circle_test
 
+    # Install Depedencies
     steps:
+      # checkout source code to working directory
       - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
 
         # Download and cache dependencies
-      - restor_cache:
-        keys:
-          - v1-dependencies-{{ checksum "pollsapi/Pipfile" }}
-          # fallback to using the latest cache if not exact match fount
-          - v1-dependencies-
+      - restore_cache:
+          key: deps9-{{ .Branch }} - {{ checksum "Pipfile.lock" }}
 
       - run:
-          name: install dependencies
-          command: |
-            python3 -m venv venv
-            . pipenv shell
+          name: pipenv
+          command: |    # use pipenv to install depedencies
+            sudo pip install pipenv
             pipenv install
 
       - save_cache:
+          key: deps9-{{ .Branch }} - {{ checksum "Pipfile.lock" }}
           paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "Pipfile" }}
+            - "./venv"
+            - "/usr/local/bin"
+            - "/usr/local/lib/python3.6/site-packages"
 
       - run:
           name: run tests
-          command: |
-            . pipenv shell
-            cd pollsapi
-            python manage.py test
+          command: |    # Run test
+            pipenv run python manage.py test
 
       - store_artifacts:
           path: test-reports
