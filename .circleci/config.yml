@@ -4,7 +4,7 @@ version: 2
 jobs:
   build:
     # Working Directory
-    working_directory: ~/Rest-polls
+    working_directory: ~/repo
     docker:
       # Python Version
       - image: circleci/python:3.6.1
@@ -45,7 +45,9 @@ jobs:
       - run:
           name: run tests
           command: |    # Run test
-            python manage.py test
+            cd Rest-polls
+            pipenv shell
+            python manage.py test polls/test
 
       - store_artifacts:
           path: test-reports
