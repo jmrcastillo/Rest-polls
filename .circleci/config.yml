@@ -45,9 +45,7 @@ jobs:
       - run:
           name: run tests
           command: |    # Run test
-            cd Rest-polls
-            pipenv shell
-            python manage.py test polls/test
+            pipenv run python manage.py test polls/test
 
       - store_artifacts:
           path: test-reports
