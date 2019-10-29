@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.urls import include, path
 from django.contrib import admin
+# core api
+from rest_framework.documentation import include_docs_urls
 # rest swagger
 from rest_framework_swagger.views import get_swagger_view
 schema_view = get_swagger_view(title='Polls API')
@@ -25,4 +27,6 @@ urlpatterns = [
     path('', include('polls.urls')),
     # rest swagger
     path('swagger-docs/', schema_view),
+    # coreapi
+    path('docs/', include_docs_urls(title='Polls API')),
 ]
