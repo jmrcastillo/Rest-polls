@@ -13,11 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import include, url
+from django.urls import include, path
 from django.contrib import admin
+# rest swagger
+from rest_framework_swagger.views import get_swagger_view
+schema_view = get_swagger_view(title='Polls API')
 
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^', include('polls.urls')),
+    path('admin/', admin.site.urls),
+    path('', include('polls.urls')),
+    # rest swagger
+    path('swagger-docs/', schema_view),
 ]
